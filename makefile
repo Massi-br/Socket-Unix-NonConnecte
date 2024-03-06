@@ -14,7 +14,7 @@ $(executable_client): $(objects_client)
 $(executable_serveur): $(objects_serveur)
 	$(CC) $(objects_serveur) -o $(executable_serveur)
 
-%.o: %.c headers.h
+%.o: %.c header.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
