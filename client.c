@@ -18,25 +18,31 @@ int main() {
 
     // ÉCHANGE DE DONNÉES
     char buffer[BUF_SIZE];
-    printf("Entrer une chaine de caractères:\n");
 
-    if (fgets(buffer, BUF_SIZE, stdin) != NULL) {
+    while (fgets(buffer, BUF_SIZE, stdin) != NULL) {
+        printf("Entrer une chaine:\n");
+        // Supprime le caractère de nouvelle ligne de la saisie
+        buffer[strcspn(buffer, "\n")] = '\0';
+
         if (sendto(socket_fd, buffer, strlen(buffer), 0, (struct sockaddr*)&addr_serv, sizeof(addr_serv)) == -1) {
             perror("sendTo");
             exit(EXIT_FAILURE);
         }
-    } else {
-        fprintf(stderr, "fgets\n");
-        exit(EXIT_FAILURE);
+
+        // Attente de la réponse du serveur
+        ssize_t n = recvfrom(socket_fd, buffer, BUF_SIZE, 0, NULL, NULL);
+        if (n == -1) {
+            perror("recvfrom");
+            exit(EXIT_FAILURE);
+        }
+
+        // Affichage de la réponse du serveur
+        printf("Server: %s\n", buffer);
     }
 
     // FERMETURE DE LA SOCKET
     if (close(socket_fd) == -1) {
         perror("close");
-        exit(EXIT_FAILURE);
-    }
-    if (unlink(ADRESSE_SERVEUR) == -1) {
-        perror("unlink");
         exit(EXIT_FAILURE);
     }
 
